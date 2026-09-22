@@ -1,0 +1,15 @@
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/bin/Debug/net10.0/OOP-Hotel
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/bin/Debug/net10.0/OOP-Hotel.deps.json
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/bin/Debug/net10.0/OOP-Hotel.runtimeconfig.json
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/bin/Debug/net10.0/OOP-Hotel.dll
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/bin/Debug/net10.0/OOP-Hotel.pdb
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.GeneratedMSBuildEditorConfig.editorconfig
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.AssemblyInfoInputs.cache
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.AssemblyInfo.cs
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.csproj.CoreCompileInputs.cache
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.sourcelink.json
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.dll
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/refint/OOP-Hotel.dll
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.pdb
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/OOP-Hotel.genruntimeconfig.cache
+/home/jack/Documents/learn-new-stuff/OOP-Hotel/obj/Debug/net10.0/ref/OOP-Hotel.dll

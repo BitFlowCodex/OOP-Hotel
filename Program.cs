@@ -6,7 +6,9 @@ namespace OOP_Hotel
   {
     static void Main(string[] args)
     {
-      Console.WriteLine("Hello World!");
+      HotelBooking hotelboking = new HotelBooking("jack minayerdji", DateTime.Now, 5);
+
+      hotelboking.test();
     }
   }
 }
