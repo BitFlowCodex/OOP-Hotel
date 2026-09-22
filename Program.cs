@@ -32,6 +32,15 @@ namespace OOP_Hotel
       {
         Console.WriteLine("Invalid date format");
       }
+      DateTime currentDate = DateTime.Now;
+      if (parsedDate.CompareTo(currentDate) > 0)
+      {
+        Console.WriteLine("Date is earlier");
+      } else
+      {
+        Console.WriteLine("Date is older");
+      }
+      
 
       Console.WriteLine("Enter length of stay in days: ");
       string stayDays = Console.ReadLine();
@@ -48,9 +57,8 @@ namespace OOP_Hotel
 
       HotelBooking hotelboking = new HotelBooking(guestName, parsedDate, lengthOfStayInDays);
 
-      hotelboking.test();
       // hotelboking.UpdateLengthOfStay();
-      Console.WriteLine($"Total Price: {hotelboking.CalculateTotalPrice()}");
+      hotelboking.DisplayBookingInfo();
     }
   }
 }

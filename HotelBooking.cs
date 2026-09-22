@@ -5,7 +5,7 @@ class HotelBooking
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
   public double PricePerNight { get; set; }
-  public int lengthOfStayInDays { get; set; }
+  public int LengthOfStayInDays { get; set; }
 
   public HotelBooking(string guestName, DateTime startDate, int lengthOfStayInDays)
   {
@@ -13,6 +13,7 @@ class HotelBooking
     StartDate = startDate;
     // Räknar nuvarande dag och lägger till vad användaren har
     EndDate = startDate.AddDays(lengthOfStayInDays);
+    LengthOfStayInDays = lengthOfStayInDays;
     PricePerNight = 100;
   }
 
@@ -48,11 +49,10 @@ class HotelBooking
 
   public void DisplayBookingInfo()
   {
-
-  }
-
-  public void test()
-  {
-    Console.WriteLine($"Namn: {GuestName}, StartDate: {StartDate}, EndDate: {EndDate}");
+    Console.WriteLine($"Guest name: {GuestName}");
+    Console.WriteLine($"Booking date: {StartDate} to {EndDate}");
+    Console.WriteLine($"Length of stay in day: {LengthOfStayInDays}");
+    Console.WriteLine($"Total price: {CalculateTotalPrice()}");
+    
   }
 }
