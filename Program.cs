@@ -12,7 +12,7 @@ namespace OOP_Hotel
       if (guestName != "")
       {
         Console.WriteLine($"Guest name is: {guestName}");
-      } 
+      }
       else
       {
         Console.WriteLine("Guest name is required");
@@ -37,6 +37,14 @@ namespace OOP_Hotel
       string stayDays = Console.ReadLine();
 
       int lengthOfStayInDays = int.Parse(stayDays);
+      if (lengthOfStayInDays <= 0)
+      {
+        Console.WriteLine("Days must be over 0");
+      }
+      else
+      {
+        Console.WriteLine($"Days: {lengthOfStayInDays}");
+      }
 
       HotelBooking hotelboking = new HotelBooking(guestName, parsedDate, lengthOfStayInDays);
 

@@ -42,7 +42,8 @@ class HotelBooking
   public double CalculateTotalPrice()
   {
     double totalPrice = (EndDate - StartDate).Days * PricePerNight;
-    return totalPrice;
+    if (totalPrice <= 0) { return 0; }
+    else { return totalPrice; }
   }
 
   public void DisplayBookingInfo()
