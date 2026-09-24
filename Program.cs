@@ -59,6 +59,8 @@ namespace OOP_Hotel
 
       // hotelboking.UpdateLengthOfStay();
       hotelboking.DisplayBookingInfo();
-    }
+            Console.ReadLine();
+        }
+       
   }
 }
