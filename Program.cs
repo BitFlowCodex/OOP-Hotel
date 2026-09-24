@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Net.Http.Headers;
 
 namespace OOP_Hotel
 {
@@ -13,18 +14,31 @@ namespace OOP_Hotel
             string guestPhone = GetUserStringInput("Vad är ditt telefonnummer?");
             Person guestPerson = new Person(guestName, guestEmail, guestPhone);
 
-            HotelBooking? finalBooking = null;
+
+            HotelBooking? finalBooking = Book(guestPerson);
+            finalBooking?.DisplayBookingInfo();
+
+            while (true)
+            {
+                finalBooking = Options(guestPerson, finalBooking);
+            }
+        }
+
+        private static HotelBooking? Book(Person guestPerson)
+        {
+            HotelBooking? booking = null;
+
             do
             {
                 try
                 {
                     DateTime startDate = GetUserDateInput("Välj ett startdatum för din bokning. (YYYY-MM-DD)");
                     int lengthInDayslengthOfStayInDays = GetUserLengthInDaysInput();
-                    HotelBooking booking = new HotelBooking(guestPerson, startDate, lengthInDayslengthOfStayInDays);
-                    if (GetUserWantsToBook(booking, lengthInDayslengthOfStayInDays))
+                    HotelBooking tempBooking = new HotelBooking(guestPerson, startDate, lengthInDayslengthOfStayInDays);
+                    if (GetUserWantsToBook(tempBooking, lengthInDayslengthOfStayInDays))
                     {
                         Console.WriteLine("Systemet har hanterat din bokning!");
-                        finalBooking = booking;
+                        booking = tempBooking;
                     }
                     else
                     {
@@ -36,10 +50,91 @@ namespace OOP_Hotel
                     Console.WriteLine("Det blev något fel i din bokning, vänligen försök igen.");
                     Console.WriteLine($"Fel: {ex.Message}");
                 }
-            } while (finalBooking == null);
+            } while (booking == null);
 
+            return booking;
+        }
 
-            finalBooking.DisplayBookingInfo();
+        private static HotelBooking? Options(Person guestPerson, HotelBooking? finalBooking)
+        {
+            string noBookingInSystem = "Du har ingen bokning i systemet.";
+            int userPick;
+            while (true)
+            {
+                Console.WriteLine("1. Avsluta");
+                Console.WriteLine("2. Lägg till dagar");
+                Console.WriteLine("3. Boka");
+                Console.WriteLine("4. Avboka");
+                Console.WriteLine("5. Visa Bokning");
+
+                if (int.TryParse(Console.ReadLine() ?? "", out userPick) && userPick >= 1 && userPick <= 5)
+                {
+                    break;
+                }
+
+                Console.WriteLine(Messages.InvalidInput);
+            }
+
+            switch (userPick)
+            {
+                case 1:
+                    Console.WriteLine("Hej då!");
+                    Environment.Exit(0);
+                    break;
+
+                case 2:
+                    while (true)
+                    {
+                        Console.WriteLine("Hur många dagar vill du lägga till? (1-365 dagar)");
+                        if (int.TryParse(Console.ReadLine(), out int days) && days >= 1 && days <= 365)
+                        {
+                            if (finalBooking != null && finalBooking.AddDays(days))
+                            {
+                                Console.WriteLine($"Du lade till {days} dagar till din bokning! Det nya priset är {finalBooking.Price}kr.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Något blev fel med ökningen.");
+                            }
+                            break;
+                        }
+                        Console.WriteLine(Messages.InvalidInput);
+                    }
+                    break;
+
+                case 3:
+                    if (finalBooking != null)
+                    {
+                        Console.WriteLine("Du måste avboka innan du kan göra en ny bokning.");
+                    }
+                    else
+                    {
+                        finalBooking = Book(guestPerson);
+                        finalBooking?.DisplayBookingInfo();
+                    }
+                    break;
+
+                case 4:
+                    if (finalBooking != null)
+                    {
+                        finalBooking = null;
+                        Console.WriteLine("Din bokning har tagits bort från systemet.");
+                    }
+                    else
+                    {
+                        Console.WriteLine(noBookingInSystem);
+                    }
+                    break;
+                case 5:
+                    if (finalBooking == null)
+                        Console.WriteLine(noBookingInSystem);
+                    else
+                    {
+                        finalBooking.DisplayBookingInfo();
+                    }
+                    break;
+            }
+            return finalBooking;
         }
 
         private static string GetUserStringInput(string question)
@@ -55,7 +150,7 @@ namespace OOP_Hotel
                 }
                 else
                 {
-                    Console.WriteLine("Du gav en felaktig inmatning");
+                    Console.WriteLine(Messages.InvalidInput);
                 }
             } while (true);
         }
@@ -78,7 +173,7 @@ namespace OOP_Hotel
                 }
                 else
                 {
-                    Console.WriteLine("Du gav en felaktig inmatning.");
+                    Console.WriteLine(Messages.InvalidInput);
                 }
             } while (true);
         }
@@ -94,14 +189,14 @@ namespace OOP_Hotel
                 {
                     if (userInt < 1)
                     {
-                        Console.WriteLine("Bokningen måste vara minst 1 dag");
+                        Console.WriteLine("Bokningen måste vara minst 1 dag.");
                         continue;
                     }
                     return userInt;
                 }
                 else
                 {
-                    Console.WriteLine("Du gav en felaktig inmatning");
+                    Console.WriteLine(Messages.InvalidInput);
                 }
             } while (true);
         }

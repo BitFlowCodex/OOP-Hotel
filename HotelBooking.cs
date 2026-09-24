@@ -44,15 +44,26 @@
             Console.WriteLine($"Telefon: {Person.Phone}");
             Console.WriteLine($"Startdatum: {StartDate}");
             Console.WriteLine($"Slutdatum: {EndDate}");
-            Console.WriteLine($"Totalla priset: {Price}kr");
+            Console.WriteLine($"Totala priset: {Price}kr");
         }
 
-        public void AddDays(int days)
+        public bool AddDays(int days)
         {
-            if (days > 365 || EndDate.AddDays(days) > DateTime.MaxValue) return;
+            if (days < 1 || days > 365 || EndDate < DateTime.Today) return false;
 
-            EndDate = EndDate.AddDays(days);
-            Price += BaseDayPrice * days;
+            //if (EndDate > DateTime.MaxValue.AddDays(-days)) return false;
+
+            try
+            {
+                EndDate = EndDate.AddDays(days);
+                Price += BaseDayPrice * days;
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+
         }
     }
 }
