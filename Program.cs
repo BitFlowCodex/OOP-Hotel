@@ -12,19 +12,20 @@ namespace OOP_Hotel
             string guestName = GetUserStringInput("Vad är ditt namn?");
             string guestEmail = GetUserStringInput("Vad är din email?");
             string guestPhone = GetUserStringInput("Vad är ditt telefonnummer?");
-            Person guestPerson = new Person(guestName, guestEmail, guestPhone);
+            Person primaryGuest = new Person(guestName, guestEmail, guestPhone);
 
 
-            HotelBooking? finalBooking = Book(guestPerson);
+            HotelBooking? finalBooking = Book(primaryGuest, AskAboutExtraGuests());
             finalBooking?.DisplayBookingInfo();
 
-            while (true)
+            bool exit;
+            do
             {
-                finalBooking = Options(guestPerson, finalBooking);
-            }
+                finalBooking = Options(primaryGuest, finalBooking, out exit);
+            } while (!exit);
         }
 
-        private static HotelBooking? Book(Person guestPerson)
+        private static HotelBooking? Book(Person primaryGuest, List<Person>? extraGuests = null)
         {
             HotelBooking? booking = null;
 
@@ -34,7 +35,19 @@ namespace OOP_Hotel
                 {
                     DateTime startDate = GetUserDateInput("Välj ett startdatum för din bokning. (YYYY-MM-DD)");
                     int lengthInDayslengthOfStayInDays = GetUserLengthInDaysInput();
-                    HotelBooking tempBooking = new HotelBooking(guestPerson, startDate, lengthInDayslengthOfStayInDays);
+                    HotelBooking tempBooking = new HotelBooking(primaryGuest, startDate, lengthInDayslengthOfStayInDays);
+                    
+                    if (extraGuests != null)
+                    {
+                        foreach (Person extraGuest in extraGuests)
+                        {
+                            if (!tempBooking.AddGuest(extraGuest))
+                            {
+                                Console.WriteLine($"{extraGuest.Name} är redan en gäst!");
+                            }
+                        }
+                    }
+
                     if (GetUserWantsToBook(tempBooking, lengthInDayslengthOfStayInDays))
                     {
                         Console.WriteLine("Systemet har hanterat din bokning!");
@@ -55,19 +68,29 @@ namespace OOP_Hotel
             return booking;
         }
 
-        private static HotelBooking? Options(Person guestPerson, HotelBooking? finalBooking)
+        private static HotelBooking? Options(Person guestPerson, HotelBooking? finalBooking, out bool exit)
         {
-            string noBookingInSystem = "Du har ingen bokning i systemet.";
+            exit = false;
             int userPick;
+            // 8 options
+            string[] options = [
+                "Avsluta",
+                    "Lägg till dagar",
+                    "Boka",
+                    "Avboka",
+                    "Visa bokning",
+                    "Visa priser",
+                    "Ändra kontaktuppgifter",
+                    "Lägg till extra gäster"
+            ];
             while (true)
             {
-                Console.WriteLine("1. Avsluta");
-                Console.WriteLine("2. Lägg till dagar");
-                Console.WriteLine("3. Boka");
-                Console.WriteLine("4. Avboka");
-                Console.WriteLine("5. Visa Bokning");
+                for (int i = 0; i < options.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {options[i]}");
+                }
 
-                if (int.TryParse(Console.ReadLine() ?? "", out userPick) && userPick >= 1 && userPick <= 5)
+                if (int.TryParse(Console.ReadLine() ?? "", out userPick) && userPick >= 1 && userPick <= options.Length)
                 {
                     break;
                 }
@@ -79,7 +102,7 @@ namespace OOP_Hotel
             {
                 case 1:
                     Console.WriteLine("Hej då!");
-                    Environment.Exit(0);
+                    exit = true;
                     break;
 
                 case 2:
@@ -119,18 +142,49 @@ namespace OOP_Hotel
                     {
                         finalBooking = null;
                         Console.WriteLine("Din bokning har tagits bort från systemet.");
+                        break;
                     }
-                    else
-                    {
-                        Console.WriteLine(noBookingInSystem);
-                    }
+                    Console.WriteLine(Messages.NoBookingInSystem);
                     break;
                 case 5:
                     if (finalBooking == null)
-                        Console.WriteLine(noBookingInSystem);
-                    else
                     {
-                        finalBooking.DisplayBookingInfo();
+                        Console.WriteLine(Messages.NoBookingInSystem);
+                        break;
+                    }
+                    finalBooking.DisplayBookingInfo();
+                    break;
+                case 6:
+                    Console.WriteLine("Priser:");
+                    Console.WriteLine($"Pris för bokning: {HotelBooking.BasePrice}kr");
+                    Console.WriteLine($"Yttligare kostnad per natt: {HotelBooking.BasePerNightPrice}kr");
+                    Console.WriteLine($"Yttligare kostnad per extra person över {HotelBooking.GuestsWithoutExtraFee}: {HotelBooking.ExtraGuestFee}kr per natt");
+                    Console.WriteLine($"Efter 3 nätter gäller 25% rabatt och 50% rabatt efter 7 nätter");
+                    break;
+                case 7:
+                    Console.WriteLine("Vill du ändra ditt namn?");
+                    if (GetUserYesOrNoInput())
+                        guestPerson.SetName(GetUserStringInput("Vad vill du ange som ditt nya namn?"));
+
+                    Console.WriteLine("Vill du ändra din email?");
+                    if (GetUserYesOrNoInput())
+                        guestPerson.SetEmail(GetUserStringInput("Vad vill du ange som din nya email?"));
+
+                    Console.WriteLine("Vill du ändra ditt telefonnummer?");
+                    if (GetUserYesOrNoInput())
+                        guestPerson.SetPhone(GetUserStringInput("Vad vill du ange som ditt nya telefonnummer?"));
+                    break;
+                case 8:
+                    var extraGuests = AskAboutExtraGuests();
+                    if (extraGuests != null)
+                    {
+                        foreach (var extraGuest in extraGuests)
+                        {
+                            if (finalBooking != null && !finalBooking.AddGuest(extraGuest))
+                            {
+                                Console.WriteLine($"{extraGuest.Name} är redan en gäst!");
+                            }
+                        }
                     }
                     break;
             }
@@ -201,12 +255,10 @@ namespace OOP_Hotel
             } while (true);
         }
 
-        private static bool GetUserWantsToBook(HotelBooking booking, int lengthInDayslengthOfStayInDays)
+        private static bool GetUserYesOrNoInput()
         {
-            do
+            while (true)
             {
-                Console.WriteLine($"Priset på bokningen i {lengthInDayslengthOfStayInDays} dagar blir {booking.Price}kr. Är du nöjd med bokningen? (JA/NEJ)");
-
                 string userInput = Console.ReadLine() ?? "";
 
                 if (userInput.ToLower() == "ja")
@@ -221,7 +273,31 @@ namespace OOP_Hotel
                 {
                     Console.WriteLine("Du måste skriva JA eller NEJ");
                 }
-            } while (true);
+            }
+        }
+        private static List<Person>? AskAboutExtraGuests()
+        {
+            Console.WriteLine("Vill du ha med dig några extra gäster?");
+            bool userWantsExtraGuests = GetUserYesOrNoInput();
+            if (!userWantsExtraGuests) return null;
+
+            var extraGuests = new List<Person>();
+            do
+            {
+                string extraGuestName = GetUserStringInput("Ange namnet på gästen:");
+                Person extraGuest = new Person(extraGuestName);
+                extraGuests.Add(extraGuest);
+                Console.WriteLine("Vill du ha yttligare gäster?");
+                userWantsExtraGuests = GetUserYesOrNoInput();
+            } while (userWantsExtraGuests);
+
+            return extraGuests;
+        }
+        private static bool GetUserWantsToBook(HotelBooking booking, int lengthInDayslengthOfStayInDays)
+        {
+            Console.WriteLine($"Priset på bokningen i {lengthInDayslengthOfStayInDays} dagar blir {booking.Price}kr. Är du nöjd med bokningen? (JA/NEJ)");
+
+            return GetUserYesOrNoInput();
         }
     }
 }

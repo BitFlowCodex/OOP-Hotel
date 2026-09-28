@@ -2,14 +2,19 @@
 {
     public class HotelBooking
     {
-        public Person Person { get; private set; }
+        public Person PrimaryGuest { get; private set; }
+        public List<Person> Guests { get; private set; }
+        public List<Person> NonPrimaryGuests => Guests.Where(guest => guest != PrimaryGuest).ToList();
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; private set; }
         public double Price { get; private set; } = 0.0;
-        public double BaseDayPrice { get; private set; } = 150.0;
-        public double BasePrice { get; private set; } = 200.0;
+        public const double BasePerNightPrice = 150.0;
+        public const double ExtraGuestFee = 50.0;
+        public const int GuestsWithoutExtraFee = 2;
+        public const double BasePrice = 200.0;
+        public int LengthInDaysOfStay => (EndDate - StartDate).Days;
 
-        public HotelBooking(Person person, DateTime startDate, int lengthInDayslengthOfStayInDays)
+        public HotelBooking(Person primaryGuest, DateTime startDate, int lengthInDayslengthOfStayInDays)
         {
             if (startDate < DateTime.Today)
             {
@@ -30,20 +35,59 @@
             {
                 throw new ArgumentOutOfRangeException(nameof(lengthInDayslengthOfStayInDays), "Slutdatumet sträcker sig för långt fram i tiden.");
             }
-            Person = person;
+            PrimaryGuest = primaryGuest;
+            Guests = [primaryGuest];
             StartDate = startDate;
             EndDate = StartDate.AddDays(lengthInDayslengthOfStayInDays);
-            Price = lengthInDayslengthOfStayInDays * BaseDayPrice + BasePrice;
+            //Price = lengthInDayslengthOfStayInDays * BasePerDayPrice + BasePrice;
+            RecalculateTotalPrice();
+        }
+        private double CalculateNightPrice(int night, double nightPrice)
+        {
+            if (night <= 3)
+                return nightPrice;
+
+            if (night <= 7)
+                return nightPrice * 0.75;
+
+            return nightPrice * 0.5;
+        }
+        private void RecalculateTotalPrice()
+        {
+            double extraFee = Math.Max(0, Guests.Count - GuestsWithoutExtraFee) * ExtraGuestFee;
+
+            double nightPrice = BasePerNightPrice + extraFee;
+
+            double total = BasePrice;
+
+            for (int night = 1; night <= LengthInDaysOfStay; night++)
+            {
+                total += CalculateNightPrice(night, nightPrice);
+            }
+
+            Price = total;
         }
 
         public void DisplayBookingInfo()
         {
             Console.WriteLine("Gästinfo:");
-            Console.WriteLine($"Namn: {Person.Name}");
-            Console.WriteLine($"Email: {Person.Email}");
-            Console.WriteLine($"Telefon: {Person.Phone}");
-            Console.WriteLine($"Startdatum: {StartDate}");
-            Console.WriteLine($"Slutdatum: {EndDate}");
+            Console.WriteLine($"Email: {PrimaryGuest.Email}");
+            Console.WriteLine($"Telefon: {PrimaryGuest.Phone}");
+            Console.WriteLine();
+
+            if (NonPrimaryGuests.Count >= 1)
+            {
+                Console.WriteLine("Yttligare gäster:");
+                foreach (Person guest in NonPrimaryGuests)
+                {
+                    Console.WriteLine($"Namn: {guest.Name}");
+                    Console.WriteLine();
+                }
+            }
+            Console.WriteLine("Bokingsinfo:");
+            Console.WriteLine($"Startdatum: {StartDate.ToShortDateString()}");
+            Console.WriteLine($"Slutdatum: {EndDate.ToShortDateString()}");
+            Console.WriteLine();
             Console.WriteLine($"Totala priset: {Price}kr");
         }
 
@@ -56,7 +100,7 @@
             try
             {
                 EndDate = EndDate.AddDays(days);
-                Price += BaseDayPrice * days;
+                RecalculateTotalPrice();
                 return true;
             }
             catch (ArgumentOutOfRangeException)
@@ -64,6 +108,16 @@
                 return false;
             }
 
+        }
+
+        public bool AddGuest(Person person)
+        {
+            if (Guests.Contains(person))
+                return false;
+
+            Guests.Add(person);
+            RecalculateTotalPrice();
+            return true;
         }
     }
 }
