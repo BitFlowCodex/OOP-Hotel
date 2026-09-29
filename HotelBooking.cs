@@ -1,6 +1,5 @@
 class HotelBooking
 {
-  // Egenskaper för hotelbokning
   public string GuestName { get; set; }
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
@@ -11,7 +10,6 @@ class HotelBooking
   {
     GuestName = guestName;
     StartDate = startDate;
-    // Räknar nuvarande dag och lägger till vad användaren har
     EndDate = startDate.AddDays(lengthOfStayInDays);
     LengthOfStayInDays = lengthOfStayInDays;
     PricePerNight = 100;
@@ -20,17 +18,18 @@ class HotelBooking
   public void UpdateLengthOfStay()
   {
     Console.Write("Hur många dagar vill du lägga till? ");
-    string newDay = Console.ReadLine();
-    if (int.TryParse(newDay, out int day))
+    string? newLengthOfStayInput = Console.ReadLine();
+    if (int.TryParse(newLengthOfStayInput, out int newLengthOfStay))
     {
-      if (day <= 0)
+      if (newLengthOfStay <= 0)
       {
         Console.WriteLine("Talet måste vara över 0");
       }
       else
       {
-        EndDate = StartDate.AddDays(day);
-        Console.WriteLine($"Ny SlutDatum: {EndDate}");
+        EndDate = StartDate.AddDays(newLengthOfStay);
+        LengthOfStayInDays = newLengthOfStay;
+        Console.WriteLine($"Ny SlutDatum: {EndDate}, {LengthOfStayInDays} ");
       }
 
     }
@@ -53,6 +52,6 @@ class HotelBooking
     Console.WriteLine($"Booking date: {StartDate} to {EndDate}");
     Console.WriteLine($"Length of stay in day: {LengthOfStayInDays}");
     Console.WriteLine($"Total price: {CalculateTotalPrice()}");
-    
+
   }
 }
